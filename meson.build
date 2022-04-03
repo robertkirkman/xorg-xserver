@@ -524,6 +524,7 @@ if build_xsecurity
     endif
 endif
 
+build_evdev = get_option('evdev')
 build_xv = get_option('xv')
 build_xvmc = get_option('xvmc')
 if not build_xv

@@ -40,6 +40,9 @@ extern Bool ephyr_glamor, ephyr_glamor_gles2, ephyr_glamor_skip_present;
 
 extern Bool ephyrNoXV;
 
+extern KdPointerDriver LinuxEvdevMouseDriver;
+extern KdKeyboardDriver LinuxEvdevKeyboardDriver;
+
 void processScreenOrOutputArg(const char *screen_size, const char *output, char *parent_id);
 void processOutputArg(const char *output, char *parent_id);
 void processScreenArg(const char *screen_size, char *parent_id);
@@ -70,23 +73,28 @@ InitInput(int argc, char **argv)
     KdKeyboardInfo *ki;
     KdPointerInfo *pi;
 
-    KdAddKeyboardDriver(&EphyrKeyboardDriver);
-    KdAddPointerDriver(&EphyrMouseDriver);
+    KdAddKeyboardDriver(&LinuxEvdevKeyboardDriver);
+    KdAddPointerDriver(&LinuxEvdevMouseDriver);
 
-    if (!kdHasKbd) {
-        ki = KdNewKeyboard();
-        if (!ki)
-            FatalError("Couldn't create Xephyr keyboard\n");
-        ki->driver = &EphyrKeyboardDriver;
-        KdAddKeyboard(ki);
-    }
+    if (!SeatId) {
+        KdAddKeyboardDriver(&EphyrKeyboardDriver);
+        KdAddPointerDriver(&EphyrMouseDriver);
 
-    if (!kdHasPointer) {
-        pi = KdNewPointer();
-        if (!pi)
-            FatalError("Couldn't create Xephyr pointer\n");
-        pi->driver = &EphyrMouseDriver;
-        KdAddPointer(pi);
+        if (!kdHasKbd) {
+            ki = KdNewKeyboard();
+            if (!ki)
+                FatalError("Couldn't create Xephyr keyboard\n");
+            ki->driver = &EphyrKeyboardDriver;
+            KdAddKeyboard(ki);
+        }
+
+        if (!kdHasPointer) {
+            pi = KdNewPointer();
+            if (!pi)
+                FatalError("Couldn't create Xephyr pointer\n");
+            pi->driver = &EphyrMouseDriver;
+            KdAddPointer(pi);
+        }
     }
 
     KdInitInput();
@@ -365,12 +373,7 @@ OsVendorInit(void)
     if (hostx_want_host_cursor())
         ephyrFuncs.initCursor = &ephyrCursorInit;
 
-    if (serverGeneration == 1) {
-        if (!KdCardInfoLast()) {
-            processScreenArg("640x480", NULL);
-        }
-        hostx_init();
-    }
+    KdOsInit(&EphyrOsFuncs);
 }
 
 KdCardFuncs ephyrFuncs = {
@@ -379,10 +382,19 @@ KdCardFuncs ephyrFuncs = {
     ephyrInitScreen,            /* initScreen */
     ephyrFinishInitScreen,      /* finishInitScreen */
     ephyrCreateResources,       /* createRes */
+    ephyrPreserve,              /* preserve */
+    ephyrEnable,                /* enable */
+    ephyrDPMS,                  /* dpms */
+    ephyrDisable,               /* disable */
+    ephyrRestore,               /* restore */
     ephyrScreenFini,            /* scrfini */
     ephyrCardFini,              /* cardfini */
 
     0,                          /* initCursor */
+    0,                          /* enableCursor */
+    0,                          /* disableCursor */
+    0,                          /* finiCursor */
+    0,                          /* recolorCursor */
 
     0,                          /* initAccel */
     0,                          /* enableAccel */

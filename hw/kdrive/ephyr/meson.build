@@ -3,6 +3,7 @@ srcs = [
     'ephyrinit.c',
     'ephyrcursor.c',
     'ephyr_draw.c',
+    'os.c',
     'hostx.c',
 ]
 
@@ -50,6 +51,7 @@ xephyr_server = executable(
         libxserver_exa,
         xephyr_glamor,
         kdrive,
+        linux,
         libxserver_fb,
         libxserver,
         libxserver_config,

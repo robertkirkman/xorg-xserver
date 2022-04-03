@@ -91,6 +91,8 @@ option('xcsecurity', type: 'boolean', value: false,
        description: 'Security extension')
 option('xv', type: 'boolean', value: true,
        description: 'Xv extension')
+option('evdev', type: 'boolean', value: true,
+       description: 'Xephyr evdev support')
 option('xvmc', type: 'boolean', value: true,
        description: 'XvMC extension')
 option('dga', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
