@@ -373,6 +373,7 @@ xorg_data.set('WSCONS_SUPPORT',
 xorg_data.set('HAVE_STROPTS_H', cc.has_header('stropts.h') ? '1' : false)
 xorg_data.set('HAVE_SYS_KD_H', cc.has_header('sys/kd.h') ? '1' : false)
 xorg_data.set('HAVE_SYS_VT_H', cc.has_header('sys/vt.h') ? '1' : false)
+xorg_data.set('HAVE_MODESETTING_DRIVER', build_modesetting ? '1' : false)
 
 if host_machine.system() == 'freebsd' or host_machine.system() == 'dragonfly'
     if host_machine.cpu_family() == 'x86' or host_machine.cpu_family() == 'x86_64'
@@ -415,6 +416,8 @@ configure_file(output : 'xwin-config.h',
 xwayland_data = configuration_data()
 xwayland_data.set('XWL_HAS_GLAMOR', build_glamor and (gbm_dep.found() or build_eglstream) ? '1' : false)
 xwayland_data.set('XWL_HAS_EGLSTREAM', build_eglstream ? '1' : false)
+xwayland_data.set('XWL_HAS_LIBDECOR', have_libdecor ? '1' : false)
+xwayland_data.set('XWL_HAS_XWAYLAND_EXTENSION', xwaylandproto_dep.found() ? '1' : false)
 
 configure_file(output : 'xwayland-config.h',
                input : 'xwayland-config.h.meson.in',
